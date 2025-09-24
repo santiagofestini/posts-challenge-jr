@@ -17,15 +17,6 @@ RSpec.describe "Api::V1::Posts", type: :request do
       post endpoint, params:
     end
 
-    shared_examples "returns validation errors" do |field, error_message|
-      it "returns validation errors for #{field}" do
-        make_request(invalid_params)
-
-        expect(response).to have_http_status(:unprocessable_content)
-        expect(json_response["errors"]).to include(error_message)
-      end
-    end
-
     shared_examples "successful post creation response" do
       it "returns correct JSON structure" do
         expect(response).to have_http_status(:created)
@@ -75,37 +66,32 @@ RSpec.describe "Api::V1::Posts", type: :request do
 
     context "with invalid parameters" do
       context "when title is missing" do
-        let(:invalid_params) { valid_params.except(:title) }
-        it_behaves_like "returns validation errors", "title", "Title can't be blank"
+        before { make_request(valid_params.except(:title)) }
+        it_behaves_like "returns validation errors", "Title can't be blank"
       end
 
       context "when body is missing" do
-        let(:invalid_params) { valid_params.merge(body: "") }
-        it_behaves_like "returns validation errors", "body", "Body can't be blank"
+        before { make_request(valid_params.merge(body: "")) }
+        it_behaves_like "returns validation errors", "Body can't be blank"
       end
 
       context "when ip is missing" do
-        let(:invalid_params) { valid_params.merge(user_ip: "") }
-        it_behaves_like "returns validation errors", "ip", "Ip can't be blank"
+        before { make_request(valid_params.merge(user_ip: "")) }
+        it_behaves_like "returns validation errors", "Ip can't be blank"
       end
 
       context "when user_login is missing" do
-        let(:invalid_params) { valid_params.merge(user_login: "") }
-        it_behaves_like "returns validation errors", "user_login", "Login can't be blank"
+        before { make_request(valid_params.merge(user_login: "")) }
+        it_behaves_like "returns validation errors", "Login can't be blank"
       end
 
       context "when multiple fields are invalid" do
-        it "returns all validation errors" do
-          invalid_params = valid_params.merge(title: "", body: "", user_ip: "")
-          make_request(invalid_params)
-
-          expect(response).to have_http_status(:unprocessable_content)
-          expect(json_response["errors"]).to include(
-            "Title can't be blank",
-            "Body can't be blank",
-            "Ip can't be blank"
-          )
-        end
+        before { make_request(valid_params.merge(title: "", body: "", user_ip: "")) }
+        it_behaves_like "returns validation errors", [
+          "Title can't be blank",
+          "Body can't be blank",
+          "Ip can't be blank"
+        ]
       end
     end
   end
