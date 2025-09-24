@@ -95,4 +95,68 @@ RSpec.describe "Api::V1::Posts", type: :request do
       end
     end
   end
+
+  describe "GET /api/1/posts/top" do
+    let(:top_endpoint) { "/api/1/posts/top" }
+
+    def make_top_request(params = {})
+      get top_endpoint, params:
+    end
+
+    context "with valid parameters" do
+      context "when there are posts with ratings" do
+        let!(:post1) { create(:post, title: "Best Post", body: "Great content", ratings_sum: 10, ratings_count: 2) }
+        let!(:post2) { create(:post, title: "Good Post", body: "Nice content", ratings_sum: 8, ratings_count: 2) }
+        let!(:post3) { create(:post, title: "OK Post", body: "Average content", ratings_sum: 6, ratings_count: 3) }
+
+        it "returns the top posts by rating" do
+          make_top_request(limit: 2)
+
+          expect(response).to have_http_status(:ok)
+          expect(JSON.parse(response.body)).to eq({
+            "posts" => [
+              { "id" => post1.id, "title" => "Best Post", "body" => "Great content" },
+              { "id" => post2.id, "title" => "Good Post", "body" => "Nice content" }
+            ]
+          })
+        end
+
+        context "when limit is nil" do
+          it "returns all posts sorted by rating" do
+            make_top_request(limit: nil)
+
+            expect(response).to have_http_status(:ok)
+            expect(JSON.parse(response.body)).to eq({
+              "posts" => [
+                { "id" => post1.id, "title" => "Best Post", "body" => "Great content" },
+                { "id" => post2.id, "title" => "Good Post", "body" => "Nice content" },
+                { "id" => post3.id, "title" => "OK Post", "body" => "Average content" }
+              ]
+            })
+          end
+        end
+      end
+
+      context "when there are no posts with ratings" do
+        let!(:post1) { create(:post, title: "Best Post", body: "Great content") }
+        let!(:post2) { create(:post, title: "Good Post", body: "Nice content") }
+
+        it "returns an empty array" do
+          make_top_request(limit: 2)
+        end
+      end
+    end
+
+    context "with invalid parameters" do
+      context "when limit is not a number" do
+        it "returns an error" do
+          make_top_request(limit: "not a number")
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(JSON.parse(response.body)).to eq({
+            "errors" => "invalid value for Integer(): \"not a number\""
+          })
+        end
+      end
+    end
+  end
 end

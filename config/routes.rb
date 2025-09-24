@@ -7,7 +7,11 @@ Rails.application.routes.draw do
 
   namespace :api do
     scope "1", module: "v1" do
-      resources :posts, only: [ :create ]
+      resources :posts, only: [ :create ] do
+        collection do
+          get :top
+        end
+      end
       resources :ratings, only: [ :create ]
     end
   end

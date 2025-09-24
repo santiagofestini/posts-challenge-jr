@@ -34,4 +34,11 @@ class Post < ApplicationRecord
 
     ratings_sum.to_f / ratings_count
   end
+
+  def self.top_by_rating(limit)
+    where("ratings_count > 0")
+      .select("posts.*, CASE WHEN ratings_count > 0 THEN ratings_sum::decimal / ratings_count ELSE 0 END as calculated_avg")
+      .order("calculated_avg DESC")
+      .limit(limit)
+  end
 end
