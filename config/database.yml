@@ -1,0 +1,17 @@
+default: &DEFAULT
+  adapter: postgresql
+  encoding: utf8
+  host: <%= ENV['DB_HOST'] || '127.0.0.1' %>
+  port: <%= ENV['DB_PORT'] || 5432 %>
+  username: <%= ENV['DB_USERNAME'] || 'postgres' %>
+  password: <%= ENV['DB_PASSWORD'] || 'password' %>
+  pool: <%= ENV['DB_POOL'] || ENV['RAILS_MAX_THREADS'] || 5 %>
+  timeout: <%= ENV['DB_TIMEOUT'] || 5000 %>
+
+development:
+  <<: *DEFAULT
+  database: posts_challenge_jr_development
+
+test:
+  <<: *DEFAULT
+  database: posts_challenge_jr_test
