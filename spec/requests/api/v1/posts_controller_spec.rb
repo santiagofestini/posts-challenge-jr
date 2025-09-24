@@ -159,4 +159,72 @@ RSpec.describe "Api::V1::Posts", type: :request do
       end
     end
   end
+
+  describe "GET /api/1/posts/shared_ips" do
+    let(:shared_ips_endpoint) { "/api/1/posts/shared_ips" }
+
+    def make_shared_ips_request
+      get shared_ips_endpoint
+    end
+
+    let(:login1) { "Jimmy" }
+    let(:login2) { "Kima" }
+    let(:login3) { "Bubbles" }
+    let(:ip1) { "192.168.1.1" }
+    let(:ip2) { "10.0.0.1" }
+    let(:ip3) { "172.16.0.1" }
+
+    context "when there are IPs with multiple authors" do
+      let!(:user1) { create(:user, login: login1) }
+      let!(:user2) { create(:user, login: login2) }
+      let!(:user3) { create(:user, login: login3) }
+
+      let!(:shared_ip_post1) { create(:post, user: user1, ip: ip1) }
+      let!(:shared_ip_post2) { create(:post, user: user2, ip: ip1) }
+      let!(:shared_ip_post3) { create(:post, user: user3, ip: ip1) }
+
+      let!(:another_shared_ip_post1) { create(:post, user: user1, ip: ip2) }
+      let!(:another_shared_ip_post2) { create(:post, user: user2, ip: ip2) }
+
+      let!(:single_user_ip_post) { create(:post, user: user1, ip: ip3) }
+
+      it "returns the shared IPs with their authors" do
+        make_shared_ips_request
+
+        expect(response).to have_http_status(:ok)
+        json_response = JSON.parse(response.body)
+
+        expect(json_response.size).to eq(2)
+
+        shared_ip_result = json_response.find { |item| item["ip"] == ip1 }
+        expect(shared_ip_result["author_logins"]).to contain_exactly(login1, login2, login3)
+
+        another_shared_ip_result = json_response.find { |item| item["ip"] == ip2 }
+        expect(another_shared_ip_result["author_logins"]).to contain_exactly(login1, login2)
+      end
+
+      it "excludes IPs with only one author" do
+        make_shared_ips_request
+
+        json_response = JSON.parse(response.body)
+        ip_addresses = json_response.map { |item| item["ip"] }
+        expect(ip_addresses).not_to include(ip3)
+      end
+    end
+
+    context "when there are no shared IPs" do
+      let!(:user1) { create(:user, login: login1) }
+      let!(:user2) { create(:user, login: login2) }
+
+      let!(:post1) { create(:post, user: user1, ip: ip1) }
+      let!(:post2) { create(:post, user: user2, ip: ip2) }
+
+      it "returns an empty array" do
+        make_shared_ips_request
+
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)).to eq([])
+      end
+    end
+  end
 end

@@ -74,4 +74,63 @@ RSpec.describe Post, type: :model do
       end
     end
   end
+
+  describe ".with_shared_ips" do
+    context "when no posts exist" do
+      it "returns an empty array" do
+        expect(Post.with_shared_ips.to_a).to eq([])
+      end
+    end
+
+    context "when posts exist with different scenarios" do
+      let(:login1) { "Stan" }
+      let(:login2) { "Kyle" }
+      let(:login3) { "Eric" }
+      let(:ip1) { "192.168.1.1" }
+      let(:ip2) { "10.0.0.1" }
+      let(:ip3) { "172.16.0.1" }
+
+      let!(:user1) { create(:user, login: login1) }
+      let!(:user2) { create(:user, login: login2) }
+      let!(:user3) { create(:user, login: login3) }
+
+      let!(:shared_ip_post1) { create(:post, user: user1, ip: ip1) }
+      let!(:shared_ip_post2) { create(:post, user: user2, ip: ip1) }
+      let!(:shared_ip_post3) { create(:post, user: user3, ip: ip1) }
+
+      let!(:another_shared_ip_post1) { create(:post, user: user1, ip: ip2) }
+      let!(:another_shared_ip_post2) { create(:post, user: user2, ip: ip2) }
+
+      let!(:single_user_ip_post) { create(:post, user: user1, ip: ip3) }
+
+      it "returns only IPs with multiple different authors" do
+        result = Post.with_shared_ips.to_a
+
+        expect(result.size).to eq(2)
+
+        shared_ip_result = result.find { |item| item.ip == ip1 }
+        expect(shared_ip_result.author_logins).to contain_exactly(login1, login2, login3)
+
+        another_shared_ip_result = result.find { |item| item.ip == ip2 }
+        expect(another_shared_ip_result.author_logins).to contain_exactly(login1, login2)
+      end
+
+      it "excludes IPs with only one author" do
+        result = Post.with_shared_ips.to_a
+
+        ip_addresses = result.map { |item| item.ip }
+        expect(ip_addresses).not_to include(ip3)
+        expect(ip_addresses).not_to include(ip3)
+      end
+
+      it "handles multiple posts by same user from same IP correctly" do
+        create(:post, user: user1, ip: ip1)
+
+        result = Post.with_shared_ips.to_a
+        shared_ip_result = result.find { |item| item.ip == ip1 }
+
+        expect(shared_ip_result.author_logins).to contain_exactly(login1, login2, login3)
+      end
+    end
+  end
 end

@@ -19,6 +19,12 @@ class Api::V1::PostsController < ApplicationController
     }
   end
 
+  def shared_ips
+    results = Post.with_shared_ips
+
+    render json: results.map { |r| { ip: r.ip, author_logins: r.author_logins } }
+  end
+
   private
 
   def post_params

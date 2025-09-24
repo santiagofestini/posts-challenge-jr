@@ -41,4 +41,12 @@ class Post < ApplicationRecord
       .order("calculated_avg DESC")
       .limit(limit)
   end
+
+  def self.with_shared_ips
+    Post
+      .joins(:user)
+      .select("posts.ip, ARRAY_AGG(DISTINCT users.login) AS author_logins")
+      .group("posts.ip")
+      .having("COUNT(DISTINCT posts.user_id) >= 2")
+  end
 end
