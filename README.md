@@ -57,6 +57,11 @@ bundle exec rspec
 bundle exec rubocop -a
 ```
 
+### Postman collection
+```bash
+/posts-challenge.postman_collection.json
+```
+
 ## Technical Decisions
 
 **Simple JSON Responses**: Uses Rails' built-in `as_json` and direct JSON rendering. While serializers like ActiveModel::Serializers would provide better structure for larger APIs, the simple response formats in this demo don't warrant the additional complexity.

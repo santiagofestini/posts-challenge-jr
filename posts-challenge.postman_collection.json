@@ -1,0 +1,159 @@
+{
+	"info": {
+		"name": "posts-challenge",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "title",
+							"value": "Test Post",
+							"type": "text"
+						},
+						{
+							"key": "body",
+							"value": "Lorem Ipsum",
+							"type": "text"
+						},
+						{
+							"key": "user_login",
+							"value": "santi",
+							"type": "text"
+						},
+						{
+							"key": "user_ip",
+							"value": "1.2.3.4",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/1/posts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"1",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rate Post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "post_id",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "user_id",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "value",
+							"value": "4",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/1/ratings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"1",
+						"ratings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get top posts by rating",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "limit",
+							"value": "4",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/1/posts/top",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"1",
+						"posts",
+						"top"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get shared ips",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/1/posts/shared_ips",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"1",
+						"posts",
+						"shared_ips"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
