@@ -14,9 +14,7 @@ class Api::V1::PostsController < ApplicationController
   def top
     posts = Post.top_by_rating(params[:limit])
 
-    render json: {
-      posts: posts.map { |post| post.as_json(only: [ :id, :title, :body ]) }
-    }
+    render json: posts.map { |post| post.as_json(only: [ :id, :title, :body ]) }
   end
 
   def shared_ips

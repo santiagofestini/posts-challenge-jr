@@ -113,12 +113,12 @@ RSpec.describe "Api::V1::Posts", type: :request do
           make_top_request(limit: 2)
 
           expect(response).to have_http_status(:ok)
-          expect(JSON.parse(response.body)).to eq({
-            "posts" => [
+          expect(JSON.parse(response.body)).to eq(
+            [
               { "id" => post1.id, "title" => "Best Post", "body" => "Great content" },
               { "id" => post2.id, "title" => "Good Post", "body" => "Nice content" }
             ]
-          })
+          )
         end
 
         context "when limit is nil" do
@@ -126,13 +126,13 @@ RSpec.describe "Api::V1::Posts", type: :request do
             make_top_request(limit: nil)
 
             expect(response).to have_http_status(:ok)
-            expect(JSON.parse(response.body)).to eq({
-              "posts" => [
+            expect(JSON.parse(response.body)).to eq(
+              [
                 { "id" => post1.id, "title" => "Best Post", "body" => "Great content" },
                 { "id" => post2.id, "title" => "Good Post", "body" => "Nice content" },
                 { "id" => post3.id, "title" => "OK Post", "body" => "Average content" }
               ]
-            })
+            )
           end
         end
       end
@@ -143,6 +143,7 @@ RSpec.describe "Api::V1::Posts", type: :request do
 
         it "returns an empty array" do
           make_top_request(limit: 2)
+          expect(JSON.parse(response.body)).to eq([])
         end
       end
     end
